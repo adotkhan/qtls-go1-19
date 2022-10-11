@@ -17,7 +17,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/quic-go/qtls-go1-19"
+	"github.com/Psiphon-Labs/qtls-go1-19"
 )
 
 func main() {

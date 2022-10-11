@@ -24,6 +24,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/prng"
 )
 
 const (
@@ -346,7 +348,7 @@ type clientSessionState struct {
 // SessionID-based resumption. In TLS 1.3 they were merged into PSK modes, which
 // are supported via this interface.
 //
-//go:generate sh -c "mockgen -package qtls -destination mock_client_session_cache_test.go github.com/quic-go/qtls-go1-19 ClientSessionCache"
+//go:generate sh -c "mockgen -package qtls -destination mock_client_session_cache_test.go github.com/Psiphon-Labs/qtls-go1-19 ClientSessionCache"
 type ClientSessionCache = tls.ClientSessionCache
 
 // SignatureScheme is a tls.SignatureScheme
@@ -792,6 +794,17 @@ type ExtraConfig struct {
 	// Is called when the client uses a session ticket.
 	// Restores the application data that was saved earlier on GetAppDataForSessionTicket.
 	SetAppDataFromSessionState func([]byte)
+
+	// [Psiphon]
+	// ClientHelloPRNG is used for Client Hello randomization and replay.
+	ClientHelloPRNG *prng.PRNG
+
+	// [Psiphon]
+	// GetClientHelloRandom is used to supply a specific value in the TLS
+	// Client Hello random field. This is used to send an anti-probing
+	// message, indistinguishable from random, that proves knowlegde of a
+	// shared secret key.
+	GetClientHelloRandom func() ([]byte, error)
 }
 
 // Clone clones.
